@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  
-	"vcs": {
+
+  "vcs": {
     "enabled": false,
     "clientKind": "git",
     "useIgnoreFile": false
@@ -30,6 +30,15 @@
       "recommended": true,
       "correctness": {
         "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noEmptyInterface": "off"
+      },
+      "style": {
+        "useConst": {
+          "level": "warn",
+          "fix": "none"
+        }
       }
     }
   },

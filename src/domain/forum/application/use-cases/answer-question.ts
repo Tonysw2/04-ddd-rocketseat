@@ -1,5 +1,5 @@
 import { UniqueEntityId } from '@/core/entities/value-objects/unique-entity-id'
-import { Answer } from '../entities/answer'
+import { Answer } from '../../enterprise/entities/answer'
 import type { AnswersRepository } from '../repositories/answers-repository'
 
 interface AnswerQuestionUseCaseRequest {
@@ -8,7 +8,7 @@ interface AnswerQuestionUseCaseRequest {
   questionId: string
 }
 
-type AnswerQuestionUseCaseResponse = {
+interface AnswerQuestionUseCaseResponse {
   answer: Answer
 }
 
