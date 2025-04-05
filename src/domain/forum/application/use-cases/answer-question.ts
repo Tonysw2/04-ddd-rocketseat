@@ -1,6 +1,8 @@
+import { type Either, right } from '@/core/either'
 import { UniqueEntityId } from '@/core/entities/value-objects/unique-entity-id'
 import { Answer } from '../../enterprise/entities/answer'
 import type { AnswersRepository } from '../repositories/answers-repository'
+import type { ResourceNotFoundError } from './errors/resource-not-found'
 
 interface AnswerQuestionUseCaseRequest {
   content: string
@@ -8,12 +10,10 @@ interface AnswerQuestionUseCaseRequest {
   questionId: string
 }
 
-interface AnswerQuestionUseCaseResponse {
-  answer: Answer
-}
+type AnswerQuestionUseCaseResponse = Either<ResourceNotFoundError, Answer>
 
 export class AnswerQuestionUseCase {
-  constructor(private AnswersRepository: AnswersRepository) {}
+  constructor(private answersRepository: AnswersRepository) {}
 
   async execute({
     content,
@@ -26,10 +26,8 @@ export class AnswerQuestionUseCase {
       questionId: new UniqueEntityId(questionId),
     })
 
-    await this.AnswersRepository.create(answer)
+    await this.answersRepository.create(answer)
 
-    return {
-      answer,
-    }
+    return right(answer)
   }
 }

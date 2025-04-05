@@ -4,30 +4,32 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { CommentOnQuestionUseCase } from './comment-on-question'
 
 describe('Comment On Question Use Case', () => {
-  let questionCommentsRepository: InMemoryQuestionCommentsRepository
-  let questionsRepository: InMemoryQuestionsRepository
+  let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository
+  let inMemoryQuestionsRepository: InMemoryQuestionsRepository
   let sut: CommentOnQuestionUseCase
 
   beforeEach(() => {
-    questionCommentsRepository = new InMemoryQuestionCommentsRepository()
-    questionsRepository = new InMemoryQuestionsRepository()
+    inMemoryQuestionCommentsRepository =
+      new InMemoryQuestionCommentsRepository()
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository()
     sut = new CommentOnQuestionUseCase(
-      questionsRepository,
-      questionCommentsRepository,
+      inMemoryQuestionsRepository,
+      inMemoryQuestionCommentsRepository,
     )
   })
 
   it('should be able to comment on question', async () => {
     const question = makeQuestion()
 
-    await questionsRepository.create(question)
+    await inMemoryQuestionsRepository.create(question)
 
-    const { questionComment } = await sut.execute({
+    const result = await sut.execute({
       authorId: question.id.toString(),
       questionId: question.id.toString(),
       content: 'test comment',
     })
 
-    expect(questionComment.content).toEqual('test comment')
+    expect(result.isRight()).toBe(true)
+    expect(inMemoryQuestionCommentsRepository.items[0]).toEqual(result.value)
   })
 })

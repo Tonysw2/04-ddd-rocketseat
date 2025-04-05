@@ -28,6 +28,12 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "complexity": {
+        "noBannedTypes": {
+          "fix": "none",
+          "level": "warn"
+        }
+      },
       "correctness": {
         "noUnusedImports": "error"
       },

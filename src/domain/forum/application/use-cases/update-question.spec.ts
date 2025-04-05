@@ -1,5 +1,7 @@
 import { makeQuestion } from 'test/factories/make-question'
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questions-repository'
+import { NotAllowedError } from './errors/not-allowed-error'
+import { ResourceNotFoundError } from './errors/resource-not-found'
 import { UpdateQuestionUseCase } from './update-question'
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
@@ -16,17 +18,15 @@ describe('Update Question', () => {
 
     await inMemoryQuestionsRepository.create(newQuestion)
 
-    const { question } = await sut.execute({
+    const result = await sut.execute({
       questionId: newQuestion.id.toString(),
       authorId: newQuestion.authorId.toString(),
       title: 'Updated Title',
       content: 'Updated Content',
     })
 
-    expect(question).toMatchObject({
-      title: 'Updated Title',
-      content: 'Updated Content',
-    })
+    expect(result.isRight()).toBe(true)
+    expect(inMemoryQuestionsRepository.items[0]).toEqual(result.value)
   })
 
   it('should not be able to update a question from another user', async () => {
@@ -34,14 +34,15 @@ describe('Update Question', () => {
 
     await inMemoryQuestionsRepository.create(newQuestion)
 
-    await expect(
-      sut.execute({
-        questionId: newQuestion.id.toString(),
-        authorId: 'anotherUserId',
-        title: 'Updated Title',
-        content: 'Updated Content',
-      }),
-    ).rejects.instanceOf(Error)
+    const result = await sut.execute({
+      questionId: newQuestion.id.toString(),
+      authorId: 'anotherUserId',
+      title: 'Updated Title',
+      content: 'Updated Content',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 
   it('should not be able to update a question with a wrong question id', async () => {
@@ -49,13 +50,14 @@ describe('Update Question', () => {
 
     await inMemoryQuestionsRepository.create(newQuestion)
 
-    await expect(
-      sut.execute({
-        questionId: 'wrong-question-id',
-        authorId: newQuestion.authorId.toString(),
-        title: 'Updated Title',
-        content: 'Updated Content',
-      }),
-    ).rejects.instanceOf(Error)
+    const result = await sut.execute({
+      questionId: 'wrong-question-id',
+      authorId: newQuestion.authorId.toString(),
+      title: 'Updated Title',
+      content: 'Updated Content',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 })

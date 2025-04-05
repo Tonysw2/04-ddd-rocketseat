@@ -1,33 +1,33 @@
 import { makeAnswer } from 'test/factories/make-answer'
+import { InMemoryAnswerCommentsRepository } from 'test/repositories/in-memory-answer-comments-repository'
 import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository'
 import { CommentOnAnswerUseCase } from './comment-on-answer'
-import { InMemoryAnswerCommentsRepository } from 'test/repositories/in-memory-answer-comments-repository'
 
 describe('Comment On Answer Use Case', () => {
-  let answerCommentsRepository: InMemoryAnswerCommentsRepository
-  let answersRepository: InMemoryAnswersRepository
+  let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository
+  let inMemoryAnswersRepository: InMemoryAnswersRepository
   let sut: CommentOnAnswerUseCase
 
   beforeEach(() => {
-    answerCommentsRepository = new InMemoryAnswerCommentsRepository()
-    answersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository()
     sut = new CommentOnAnswerUseCase(
-      answersRepository,
-      answerCommentsRepository,
+      inMemoryAnswersRepository,
+      inMemoryAnswerCommentsRepository,
     )
   })
 
   it('should be able to comment on answer', async () => {
     const answer = makeAnswer()
 
-    await answersRepository.create(answer)
+    await inMemoryAnswersRepository.create(answer)
 
-    const { answerComment } = await sut.execute({
+    const result = await sut.execute({
       authorId: answer.id.toString(),
       answerId: answer.id.toString(),
       content: 'test comment',
     })
 
-    expect(answerComment.content).toEqual('test comment')
+    expect(inMemoryAnswerCommentsRepository.items[0]).toEqual(result.value)
   })
 })

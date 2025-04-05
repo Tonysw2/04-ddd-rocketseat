@@ -1,13 +1,13 @@
+import { type Either, left, right } from '@/core/either'
 import type { Question } from '../../enterprise/entities/question'
 import type { QuestionsRepository } from '../repositories/questions-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found'
 
 interface GetQuestionBySlugUseCaseRequest {
   slug: string
 }
 
-interface GetQuestionBySlugUseCaseResponse {
-  question: Question
-}
+type GetQuestionBySlugUseCaseResponse = Either<ResourceNotFoundError, Question>
 
 export class GetQuestionBySlugUseCase {
   constructor(private readonly questionsRepo: QuestionsRepository) {}
@@ -18,11 +18,9 @@ export class GetQuestionBySlugUseCase {
     const question = await this.questionsRepo.findBySlug(slug)
 
     if (!question) {
-      throw new Error('Question not found.')
+      return left(new ResourceNotFoundError())
     }
 
-    return {
-      question,
-    }
+    return right(question)
   }
 }
